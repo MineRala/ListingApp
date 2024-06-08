@@ -17,6 +17,7 @@
 		E8026E202BEB93E500D9B5FD /* UIViewController+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8026E1F2BEB93E500D9B5FD /* UIViewController+Ext.swift */; };
 		E8FDDEC52C12121A00D3F017 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8FDDEC42C12121A00D3F017 /* ViewModel.swift */; };
 		E8FDDECC2C1212EC00D3F017 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8FDDECB2C1212EC00D3F017 /* Model.swift */; };
+		E8D701212C1493D40059052E /* case_study.txt in Resources */ = {isa = PBXBuildFile; fileRef = E8D701202C1493D40059052E /* case_study.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		E8026E1F2BEB93E500D9B5FD /* UIViewController+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Ext.swift"; sourceTree = "<group>"; };
 		E8FDDEC42C12121A00D3F017 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		E8FDDECB2C1212EC00D3F017 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		E8D701202C1493D40059052E /* case_study.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = case_study.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +71,13 @@
 				E8FDDEC82C12126400D3F017 /* Extension */,
 				E8FDDEC72C12125500D3F017 /* Main */,
 				E8FDDEC92C12127600D3F017 /* Cell */,
+				E8026E012BEA420B00D9B5FD /* AppDelegate.swift */,
+				E8026E032BEA420B00D9B5FD /* SceneDelegate.swift */,
+				E8026E152BEA42EA00D9B5FD /* DataSource.swift */,
+				E8026E052BEA420B00D9B5FD /* ViewController.swift */,
+				E8026E172BEA466200D9B5FD /* CustomTableViewCell.swift */,
+				E8026E1F2BEB93E500D9B5FD /* UIViewController+Ext.swift */,
+				E8D701202C1493D40059052E /* case_study.txt */,
 				E8026E0A2BEA420D00D9B5FD /* Assets.xcassets */,
 				E8026E0C2BEA420D00D9B5FD /* LaunchScreen.storyboard */,
 				E8026E0F2BEA420D00D9B5FD /* Info.plist */,
@@ -178,6 +187,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8026E0E2BEA420D00D9B5FD /* LaunchScreen.storyboard in Resources */,
+				E8D701212C1493D40059052E /* case_study.txt in Resources */,
 				E8026E0B2BEA420D00D9B5FD /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
