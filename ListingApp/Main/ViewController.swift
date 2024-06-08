@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 
 // MARK: - Class Bone
 final class ViewController: UIViewController {
@@ -41,16 +42,29 @@ final class ViewController: UIViewController {
     }()
     
     // MARK: - Attributes
-    private var nextPageId: String? = nil
-    private var data: [Person] = []
-    private var isPaginationFinished = false
-    private var retryCount = 0
+    private var viewModel: ViewModel
+    private var cancellables: Set<AnyCancellable> = .init()
+    
+    // MARK: - Cons & DeCons
+    init(viewModel: ViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    deinit {
+        cancellables.forEach { $0.cancel() }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        fetchData()
+        viewModel.fetchData()
+        addListeners()
     }
 }
 
@@ -69,94 +83,68 @@ extension ViewController {
         tableView.backgroundView = emptyListView
         tableView.backgroundView?.isHidden = true
     }
-    
-    private func updateUI() {
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-            self.tableView.backgroundView?.isHidden = !self.data.isEmpty
-            self.refreshControl.endRefreshing()
-        }
-    }
 }
-
-// MARK: - Data Fetch
+// MARK: - Listeners
 extension ViewController {
-    private func fetchData() {
-        DataSource.fetch(next: nextPageId) { [weak self] response, error in
-            guard let self else { return }
-            if let error = error {
-                self.handleFaliure(error.errorDescription)
-                return
+    private func addListeners() {
+        viewModel.people
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] presentations in
+                guard let self else { return }
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    self.tableView.reloadData()
+                    self.refreshControl.endRefreshing()
+                }
             }
-            self.retryCount = 0
-            if let response = response {
-                self.handleSuccess(with: response.people, nextPage: response.next)
-            }
-            self.updateUI()
-        }
-    }
-    
-    private func handleSuccess(with newData: [Person], nextPage: String?) {
-        if !newData.isEmpty {
-            if !data.isEmpty && nextPageId == nil { // refreshden sonra yeni veriler için önceki data verileri temizlenir
-                data.removeAll() // ilk success durumda girmez, data empty olduğu durumlarda tekar removelamasın
-            }
-            let uniquePersons = newData.filter { person in
-                !data.contains(where: { $0.id == person.id })
-            }
-            data.append(contentsOf: uniquePersons)
-            if nextPage == nil { // pagination son sayfaya ulaştıysa
-                isPaginationFinished = true
-                print("Son sayfaya ulaşıldı.")
-            }
-        } else if !data.isEmpty { // refreshden sonra empty state olursa
-            data.removeAll()
-        }
-        nextPageId = nextPage
-    }
-    
-    private func handleFaliure(_ error: String) {
-        retryCount += 1
+            .store(in: &cancellables)
         
-        if retryCount < 3 {
-            let errorMessage = "Error occurred: \(error). Retrying... (\(retryCount)/3)"
-            handleError(with: errorMessage)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
-                self?.fetchData()
+        viewModel.error
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                guard let self else { return }
+                print("Error: \(error)")
+                self.showToast(message: error)
             }
-        } else {
-            handleError(with: "Error occurred after 3 attempts. Please try again later.")
-            DispatchQueue.main.async { [weak self] in
-                self?.refreshControl.endRefreshing()
+            .store(in: &cancellables)
+        
+        viewModel.shouldShowEmptyView
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] shouldShowEmpty in
+                guard let self else { return }
+                self.tableView.backgroundView?.isHidden = !shouldShowEmpty
             }
-        }
-    }
-    
-    private func handleError(with error: String) {
-        showToast(message: error)
-        print("\(error)")
+            .store(in: &cancellables)
+        
+        viewModel.shouldRetryFetch
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] shouldRetry in
+                guard let self, shouldRetry else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    self.viewModel.fetchData()
+                }
+            }
+            .store(in: &cancellables)
     }
 }
 
 // MARK: - Actions
 extension ViewController {
     @objc func refreshData() {
-        isPaginationFinished = false
-        nextPageId = nil
-        fetchData()
+        viewModel.refresh()
     }
 }
 
 // MARK: - UITableViewDataSource
 extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if !isPaginationFinished && indexPath.row == data.count - 3 {
-            fetchData()
+        if !viewModel.getPaginationFinishedStatus() && indexPath.row == viewModel.people.value.count - 3 {
+            viewModel.fetchData()
         }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        data.count
+        viewModel.people.value.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -171,7 +159,7 @@ extension ViewController: UITableViewDelegate {
             return UITableViewCell()
         }
         cell.selectionStyle = .none
-        cell.setCell(person: data[indexPath.row])
+        cell.setCell(person: viewModel.people.value[indexPath.row])
         return cell
     }
 }

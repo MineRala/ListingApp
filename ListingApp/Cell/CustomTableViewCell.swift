@@ -49,7 +49,7 @@ extension CustomTableViewCell {
 
 // MARK: - Set
 extension CustomTableViewCell {
-    public func setCell(person: Person) {
-        titleLabel.text = person.fullName + " (\(person.id))"
+    public func setCell(person: Model) {
+        titleLabel.text = person.name + " (\(person.id))"
     }
 }
