@@ -49,7 +49,7 @@ public class DataSource {
         static let highWaitTimeRange: ClosedRange<Double> = 1.0...2.0 // lower bound must be >= 0.0
         static let errorProbability = 0.05 // must be > 0.0
         static let backendBugTriggerProbability = 0.05 // must be > 0.0
-        static let emptyFirstResultsProbability = 0.1 // must be > 0.0
+        static let emptyFirstResultsProbability = 0.5 // must be > 0.0
     }
 
     private static var people: [Person] = []
