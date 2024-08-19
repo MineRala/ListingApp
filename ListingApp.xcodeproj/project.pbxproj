@@ -15,6 +15,7 @@
 		E8026E162BEA42EA00D9B5FD /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8026E152BEA42EA00D9B5FD /* DataSource.swift */; };
 		E8026E182BEA466200D9B5FD /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8026E172BEA466200D9B5FD /* CustomTableViewCell.swift */; };
 		E8026E202BEB93E500D9B5FD /* UIViewController+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8026E1F2BEB93E500D9B5FD /* UIViewController+Ext.swift */; };
+		E8A3EAD42C6B904C006DF5B3 /* ViewControllerPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A3EAD32C6B904C006DF5B3 /* ViewControllerPresenter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		E8026E152BEA42EA00D9B5FD /* DataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
 		E8026E172BEA466200D9B5FD /* CustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
 		E8026E1F2BEB93E500D9B5FD /* UIViewController+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Ext.swift"; sourceTree = "<group>"; };
+		E8A3EAD32C6B904C006DF5B3 /* ViewControllerPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerPresenter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,17 +62,66 @@
 		E8026E002BEA420B00D9B5FD /* ListingApp */ = {
 			isa = PBXGroup;
 			children = (
-				E8026E012BEA420B00D9B5FD /* AppDelegate.swift */,
-				E8026E032BEA420B00D9B5FD /* SceneDelegate.swift */,
-				E8026E152BEA42EA00D9B5FD /* DataSource.swift */,
-				E8026E052BEA420B00D9B5FD /* ViewController.swift */,
-				E8026E172BEA466200D9B5FD /* CustomTableViewCell.swift */,
-				E8026E1F2BEB93E500D9B5FD /* UIViewController+Ext.swift */,
-				E8026E0A2BEA420D00D9B5FD /* Assets.xcassets */,
-				E8026E0C2BEA420D00D9B5FD /* LaunchScreen.storyboard */,
+				E8A3EADA2C6B90B9006DF5B3 /* Base */,
+				E8A3EAD82C6B90AA006DF5B3 /* Extensions */,
+				E8A3EAD92C6B90B3006DF5B3 /* Models */,
+				E8A3EAD52C6B905A006DF5B3 /* Scenes */,
 				E8026E0F2BEA420D00D9B5FD /* Info.plist */,
 			);
 			path = ListingApp;
+			sourceTree = "<group>";
+		};
+		E8A3EAD52C6B905A006DF5B3 /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				E8A3EAD62C6B9081006DF5B3 /* List */,
+				E8A3EAD72C6B908B006DF5B3 /* Cell */,
+			);
+			path = Scenes;
+			sourceTree = "<group>";
+		};
+		E8A3EAD62C6B9081006DF5B3 /* List */ = {
+			isa = PBXGroup;
+			children = (
+				E8A3EAD32C6B904C006DF5B3 /* ViewControllerPresenter.swift */,
+				E8026E052BEA420B00D9B5FD /* ViewController.swift */,
+			);
+			path = List;
+			sourceTree = "<group>";
+		};
+		E8A3EAD72C6B908B006DF5B3 /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				E8026E172BEA466200D9B5FD /* CustomTableViewCell.swift */,
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
+		E8A3EAD82C6B90AA006DF5B3 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				E8026E1F2BEB93E500D9B5FD /* UIViewController+Ext.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		E8A3EAD92C6B90B3006DF5B3 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				E8026E152BEA42EA00D9B5FD /* DataSource.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		E8A3EADA2C6B90B9006DF5B3 /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				E8026E012BEA420B00D9B5FD /* AppDelegate.swift */,
+				E8026E032BEA420B00D9B5FD /* SceneDelegate.swift */,
+				E8026E0A2BEA420D00D9B5FD /* Assets.xcassets */,
+				E8026E0C2BEA420D00D9B5FD /* LaunchScreen.storyboard */,
+			);
+			path = Base;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,6 +194,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E8A3EAD42C6B904C006DF5B3 /* ViewControllerPresenter.swift in Sources */,
 				E8026E182BEA466200D9B5FD /* CustomTableViewCell.swift in Sources */,
 				E8026E062BEA420B00D9B5FD /* ViewController.swift in Sources */,
 				E8026E022BEA420B00D9B5FD /* AppDelegate.swift in Sources */,
