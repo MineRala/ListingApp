@@ -7,6 +7,14 @@
 
 import UIKit
 
+protocol ViewControllerInterface: AnyObject {
+    func retryFetchData()
+    func reloadTableView()
+    func isTableBackgroundViewHidden(_ isEmptyData : Bool)
+    func endRefreshing()
+    func showToast(_ message: String)
+}
+
 // MARK: - Class Bone
 final class ViewController: UIViewController {
     // MARK: Properties
@@ -41,16 +49,23 @@ final class ViewController: UIViewController {
     }()
     
     // MARK: - Attributes
-    private var nextPageId: String? = nil
-    private var data: [Person] = []
-    private var isPaginationFinished = false
-    private var retryCount = 0
+    private let presenter: ViewControllerPresenter!
+    
+    init(presenter: ViewControllerPresenter! = ViewControllerPresenter()) {
+        self.presenter = presenter
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        presenter.view = self
         setupUI()
-        fetchData()
+        presenter.fetchData()
     }
 }
 
@@ -69,98 +84,27 @@ extension ViewController {
         tableView.backgroundView = emptyListView
         tableView.backgroundView?.isHidden = true
     }
-    
-    private func updateUI() {
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-            self.tableView.backgroundView?.isHidden = !self.data.isEmpty
-            self.refreshControl.endRefreshing()
-        }
-    }
-}
-
-// MARK: - Data Fetch
-extension ViewController {
-    private func fetchData() {
-        DataSource.fetch(next: nextPageId) { [weak self] response, error in
-            guard let self else { return }
-            if let error = error {
-                self.handleFaliure(error.errorDescription)
-                return
-            }
-            self.retryCount = 0
-            if let response = response {
-                self.handleSuccess(with: response.people, nextPage: response.next)
-            }
-            self.updateUI()
-        }
-    }
-    
-    private func handleSuccess(with newData: [Person], nextPage: String?) {
-        if !newData.isEmpty {
-            if !data.isEmpty && nextPageId == nil { // refreshden sonra yeni veriler için önceki data verileri temizlenir
-                data.removeAll() // ilk success durumda girmez, data empty olduğu durumlarda tekar removelamasın
-            }
-            let uniquePersons = newData.filter { person in
-                !data.contains(where: { $0.id == person.id })
-            }
-            data.append(contentsOf: uniquePersons)
-            if nextPage == nil { // pagination son sayfaya ulaştıysa
-                isPaginationFinished = true
-                print("Son sayfaya ulaşıldı.")
-            }
-        } else if !data.isEmpty { // refreshden sonra empty state olursa
-            data.removeAll()
-        }
-        nextPageId = nextPage
-    }
-    
-    private func handleFaliure(_ error: String) {
-        retryCount += 1
-        
-        if retryCount < 3 {
-            let errorMessage = "Error occurred: \(error). Retrying... (\(retryCount)/3)"
-            handleError(with: errorMessage)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
-                self?.fetchData()
-            }
-        } else {
-            handleError(with: "Error occurred after 3 attempts. Please try again later.")
-            DispatchQueue.main.async { [weak self] in
-                self?.refreshControl.endRefreshing()
-            }
-        }
-    }
-    
-    private func handleError(with error: String) {
-        showToast(message: error)
-        print("\(error)")
-    }
 }
 
 // MARK: - Actions
 extension ViewController {
-    @objc func refreshData() {
-        isPaginationFinished = false
-        nextPageId = nil
-        fetchData()
+    @objc private func refreshData() {
+        presenter.refreshData()
     }
 }
 
 // MARK: - UITableViewDataSource
 extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if !isPaginationFinished && indexPath.row == data.count - 3 {
-            fetchData()
-        }
+        presenter.willDisplay(at: indexPath)
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        data.count
+        presenter.numberOfRowsInSection
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        50
+        CGFloat(presenter.heightForRowAt)
     }
 }
 
@@ -171,7 +115,38 @@ extension ViewController: UITableViewDelegate {
             return UITableViewCell()
         }
         cell.selectionStyle = .none
-        cell.setCell(person: data[indexPath.row])
+        cell.setCell(person: presenter.getPerson(at: indexPath))
         return cell
+    }
+}
+
+// MARK: - ViewControllerInterface
+extension ViewController: ViewControllerInterface {
+    func retryFetchData() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+            self?.presenter.fetchData()
+        }
+    }
+    
+    func reloadTableView() {
+        DispatchQueue.main.async { [weak self] in
+            self?.tableView.reloadData()
+        }
+    }
+    
+    func isTableBackgroundViewHidden(_ isEmptyData : Bool) {
+        DispatchQueue.main.async { [weak self] in
+            self?.tableView.backgroundView?.isHidden = !isEmptyData
+        }
+    }
+    
+    func endRefreshing() {
+        DispatchQueue.main.async { [weak self] in
+            self?.refreshControl.endRefreshing()
+        }
+    }
+    
+    func showToast(_ message: String) {
+        showToast(message: message)
     }
 }
